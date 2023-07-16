@@ -11,13 +11,17 @@ from ...MetaObject import MetaObject
 
 _EXPECTED_FILES = ["links.csv", "movies.csv", "ratings.csv", "tags.csv"]
 
+# forcer types specifiques
+_EXPECTED_TYPES = {"links.csv": {"imdbId": "string"}}
+
 
 def _instantiate(config):
     dataframes = {}
     for filename in _EXPECTED_FILES:
         key = filename.split(".")[0]
         csv_path = os.path.join(config.install_path, filename)
-        dataframes[key] = read_csv(csv_path)
+        dtype = _EXPECTED_TYPES.get(filename, None)
+        dataframes[key] = read_csv(csv_path, dtype=dtype)
 
     return MetaObject.from_dict(dataframes)
 

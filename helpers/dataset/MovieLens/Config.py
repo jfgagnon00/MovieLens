@@ -11,6 +11,7 @@ class Config():
         self.delete_download = True
         self.force_install = False
 
-        # config a le pattern
-        # sera compiler lors du load des configs
         self.title_regex = ""
+        self.scrapping_mvl_url = "https://movielens.org/movies/"
+        self.scrapping_imdb_url = "https://www.imdb.com/title/tt"
+        self.scrapping_tmdb_url = "https://www.themoviedb.org/movie/"
