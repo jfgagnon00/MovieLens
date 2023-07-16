@@ -37,6 +37,5 @@ def get_configs(config_overrides, executor=None):
     if not pv_config is None:
         MetaObject.override_from_object(pv_config,
                                         config_overrides.dataset)
-
-        config_overrides.dataset = pv_config
-        config_overrides.dataset,executor = executor
+        return MetaObject.from_kwargs(dataset=pv_config,
+                                      executor=executor)

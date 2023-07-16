@@ -1,43 +1,41 @@
 import os
 import requests
 
-from pandas import DataFrame
+from pandas import DataFrame, read_csv
 from zipfile import ZipFile
 from tqdm.notebook import tqdm
-
-from .Config import Config
+from urllib.parse import urlparse
 
 from ...MetaObject import MetaObject
 
 
+_EXPECTED_FILES = ["links.csv", "movies.csv", "ratings.csv", "tags.csv"]
+
+
 def _instantiate(config):
-    mode = "r" if config.read_only else "r+"
+    dataframes = {}
+    for filename in _EXPECTED_FILES:
+        key = filename.split(".")[0]
+        csv_path = os.path.join(config.install_path, filename)
+        dataframes[key] = read_csv(csv_path)
 
-    h5_file = h5py.File(config.install_path, mode)
-    h5_dataframe = h5_file[_DATAFRAME_KEY]
-    dataframe = DataFrame({c:h5_dataframe[c].asstr()[...] for c in _DATAFRAME_COLUMNS})
+    return MetaObject.from_dict(dataframes)
 
-    path, file = os.path.split(config.install_path)
-    if file is None:
-        zip_filename = h5_dataframe.attrs[_DATAFRAME_SOURCE_ATTR]
-    else:
-        zip_filename = os.path.join(path, h5_dataframe.attrs[_DATAFRAME_SOURCE_ATTR])
-    zip_file = ZipFile(zip_filename)
-
-    return MetaObject.from_kwargs(h5_file=h5_file,
-                                  dataframe=dataframe,
-                                  get_image=lambda index: _get_image_filename(zip_file, \
-                                                                              dataframe.loc[index, "image_path"]))
-
-def _download(config, dest_path):
+def _download(config):
     try:
         r = requests.get(config.url, stream=True)
 
         content_size = int(r.headers.get('content-length'))
         content_disposition = r.headers.get('content-disposition')
-        filename = content_disposition.split("=", 1)[-1]
+
+        if content_disposition is None:
+            parsed_url = urlparse(r.url)
+            _, filename = os.path.split(parsed_url.path)
+        else:
+            filename = content_disposition.split("=", 1)[-1]
+
         filename = filename.replace('"', "")
-        filename = os.path.join(dest_path, filename)
+        filename = os.path.join(config.install_path, filename)
 
         if config.force_download or not os.path.exists(filename):
             with open(filename, "wb") as f:
@@ -51,10 +49,40 @@ def _download(config, dest_path):
     else:
         return filename
 
+def _unzip_at_root(config, zip_filename):
+    try:
+        with ZipFile(zip_filename, 'r') as zip:
+            for zip_info in zip.infolist():
+                _, filename = os.path.split(zip_info.filename)
+                if not filename:
+                    continue
+
+                dst_name = os.path.join(config.install_path, filename)
+                bytes = zip.read(zip_info)
+
+                with open(dst_name, "wb") as dst:
+                    dst.write(bytes)
+                
+    except Exception as e:
+        print(e)
+        return None
+    else:
+        return True
+
+def _exists(config):
+    if not os.path.exists(config.install_path):
+        return False
+
+    for f in _EXPECTED_FILES:
+        file_path = os.path.join(config.install_path, f)
+        if not os.path.exists(file_path):
+            return False
+
+    return True
 
 def load(config):
     """
-    Utilitaire encapsulant installation et preprocessing du dataset PlantVillage.
+    Utilitaire encapsulant installation et preprocessing du dataset MovieLens.
 
     config:
         Instance de Config
@@ -62,24 +90,26 @@ def load(config):
     Retour:
         MetaObject encapsulant le dataset ou None si probleme.
     """
-    if not config.force_install and os.path.exists(config.install_path):
+    exists = _exists(config)
+
+    if not config.force_install and exists:
         return _instantiate(config)
 
-    if config.force_install or not os.path.exists(config.install_path):
+    if config.force_install or not exists:
+        os.makedirs(config.install_path, exist_ok=True)
+
         print(f"Downloading {config.url}")
-
-        path, file = os.path.split(config.install_path)
-        if file is None:
-            path = ""
-        else:
-            os.makedirs(path, exist_ok=True)
-
-        zip_filename = _download(config, path)
+        zip_filename = _download(config)
         if zip_filename is None:
             print("Failed")
             return None
 
-        print(f"Preprocesssing {zip_filename}")
-        _preprocess_parallel(config, zip_filename)
+        print(f"Unziping {zip_filename}")
+        if not _unzip_at_root(config, zip_filename):
+            print("Failed")
+            return None
+
+        if config.delete_download:
+            os.remove(zip_filename)
 
     return _instantiate(config)

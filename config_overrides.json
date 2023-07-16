@@ -1,0 +1,7 @@
+{
+    "dataset": {
+        "url": "https://tinyurl.com/mw3vdjzj",
+        "install_path": "dataset/",
+        "title_regex": "(.*)\\s+\\((\\d+).*\\)"
+    }
+}
