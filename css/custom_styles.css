@@ -1,0 +1,57 @@
+
+/*
+ * mettre ce fichier ici: ~/.jupyter/custom/custom.css
+ */
+
+/* page plus large */
+/*
+.container {
+    width: 80%
+}
+*/
+
+/* separateur de section */
+.section_div {
+    width:70%;
+    height:1.5px;
+    border:none;
+    color:black;
+    background-color:black;
+    margin-top: 0px;
+    margin-bottom: 0px;
+}
+
+/* identifier les reponse aux questions */
+.answer {
+    color:blue;
+}
+
+.question {
+    color:red;
+}
+
+.note {
+    color:green;
+    font-weight: bold;
+}
+
+/* utilitaire pour faire des colonnes */
+.columns_2 {
+    float:left;
+    width:calc(100% / 2);
+}
+
+.columns_3 {
+    float:left;
+    width:calc(100% / 3);
+}
+
+.columns_4 {
+    float:left;
+    width:calc(100% / 4);
+}
+
+.columns_5 {
+    float:left;
+    width:calc(100% / 5);
+}
