@@ -11,6 +11,8 @@ class Config():
         self.delete_download = True
         self.force_install = False
 
+        self.genre_splitter = "|"
+
         self.title_regex = ""
         self.scrapping_mvl_url = "http://movielens.org/movies/"
         self.scrapping_tmdb_url = "https://www.themoviedb.org/movie/"
