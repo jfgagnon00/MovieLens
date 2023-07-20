@@ -29,13 +29,20 @@ def get_configs(config_overrides, executor=None):
         pass
 
     from .dataset.MovieLens.Config import Config as MovieLensConfig
+    from .WebScraping.Config import Config as WebScrapingConfig
 
     # generer les configs par defaut
-    pv_config = MovieLensConfig()
+    dataset_config = MovieLensConfig()
+    web_scraping_config = WebScrapingConfig()
 
     # appliquer les overrides
-    if not pv_config is None:
-        MetaObject.override_from_object(pv_config,
+    if not config_overrides is None:
+        MetaObject.override_from_object(dataset_config,
                                         config_overrides.dataset)
-        return MetaObject.from_kwargs(dataset=pv_config,
-                                      executor=executor)
+        
+        MetaObject.override_from_object(web_scraping_config,
+                                        config_overrides.web_scraping)
+
+    return MetaObject.from_kwargs(dataset=dataset_config,
+                                  web_scraping=web_scraping_config,
+                                  executor=executor)
