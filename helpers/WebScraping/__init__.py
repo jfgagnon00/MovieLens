@@ -1,4 +1,4 @@
-from .imdb import imdb_request
+from .imdb import imdb_requests, imdb_requests_parallel
 
 def get_nested_property(json, keys_iterable):
     """

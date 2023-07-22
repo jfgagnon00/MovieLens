@@ -18,10 +18,15 @@ _EXPECTED_TYPES = {"links.csv": {"imdbId": "string"}}
 def _instantiate(config):
     dataframes = {}
     for filename in _EXPECTED_FILES:
+        # dataframe
         key = filename.split(".")[0]
         csv_path = os.path.join(config.install_path, filename)
         dtype = _EXPECTED_TYPES.get(filename, None)
         dataframes[key] = read_csv(csv_path, dtype=dtype)
+
+        # path to dataframe
+        path_key = "_".join([key, "path"])
+        dataframes[path_key] = csv_path
 
     return MetaObject.from_dict(dataframes)
 
