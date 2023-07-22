@@ -39,6 +39,8 @@ def show_na(data):
     if na_.shape[0] > 0:
         display(na_)
 
+    return na_.index
+
 def show_types(dataframe):
     print("Types")
     types_ = dataframe.dtypes.to_frame()
