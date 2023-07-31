@@ -12,7 +12,7 @@ from ...MetaObject import MetaObject
 _EXPECTED_FILES = ["links.csv", "movies.csv", "ratings.csv", "tags.csv"]
 
 # forcer types specifiques
-_EXPECTED_TYPES = {"links.csv": {"imdbId": "string"}}
+_EXPECTED_TYPES = {"links.csv": {"imdbId": str, "tmdbId": str}}
 
 
 def _instantiate(config):

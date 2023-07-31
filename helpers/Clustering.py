@@ -360,13 +360,15 @@ def dbscan_init(coords, eps, min_samples):
     dbs.fit(coords)
     return dbs
 
-def dbscan_eps_analysis(coords, figsize=(5, 3)):
+def dbscan_eps_analysis(coords, figsize=(5, 3), ylim=None):
     nn = NearestNeighbors(n_neighbors=2)
     distances, _ = nn.fit(coords).kneighbors(coords)
     distances = np.sort(distances, axis=0)
 
     plt.figure(figsize=figsize)
     plt.plot(distances[:,1], marker=".")
+    if not ylim is None:
+        plt.ylim(ylim)
     plt.ylabel("Distance")
     plt.xlabel("Individu")
     plt.grid(True)
@@ -461,7 +463,7 @@ def clusters_analysis(coords, labels, original_data=None):
         print("Variance expliquée par les clusters")
         display(r2.round(2).to_frame().T)
     
-def show_clusters(coords_, coords_name_, labels, figsize=(5, 4), text_alpha=1):
+def show_clusters(coords_, coords_name_, labels, figsize=(5, 4), text_alpha=1, marker_size=None):
     clusters = set(labels)
     n_clusters = len(clusters)
     
@@ -475,7 +477,7 @@ def show_clusters(coords_, coords_name_, labels, figsize=(5, 4), text_alpha=1):
         coords_name = coords_name_[cluster]
 
         label = "Outliers" if k == -1 else f"Cluster_{k}"
-        plt.scatter(coords[:, 0], coords[:, 1], label=label, color=colors[k])
+        plt.scatter(coords[:, 0], coords[:, 1], label=label, color=colors[k], s=marker_size)
         
         for xy, text in zip(coords, coords_name_):
             text_ = plt.text(xy[0], xy[1], text)
