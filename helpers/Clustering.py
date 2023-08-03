@@ -4,7 +4,9 @@ import numpy as np
 import pandas as pd
 import scipy as sp
 import seaborn as sns
+import warnings
 
+from collections import namedtuple
 from matplotlib.ticker import MaxNLocator
 
 from fanalysis.mca import MCA
@@ -111,6 +113,74 @@ def transform_sqrt(data, columns=None):
         
     return result
 
+def transform_cbrt(data, columns=None):
+    result = data.copy()
+    
+    if columns is None:
+        columns = data.columns
+    
+    for c in columns:
+        doi = data[c]
+        result[c] = np.cbrt(doi)
+        
+    return result
+
+def show_transforms(data, columns=None, figsize=(10, 10)):
+    """
+    Applique et afiche diverses transformes et les retourne 
+    sous forme de namedtuple
+    Attention, boxcox est un tuple (DataFrame, boxcox lambda)
+    """
+    with warnings.catch_warnings():
+        warnings.filterwarnings("ignore", category=RuntimeWarning)
+
+        transforms_names = ["log", 
+                            "boxcox",
+                            "cbrt"]
+            
+        Transforms = namedtuple("Transforms", transforms_names)
+        transforms = Transforms(
+            transform_log(data, columns=columns),
+            transform_boxcox(data, columns=columns),
+            transform_cbrt(data, columns=columns))
+
+    if columns is None:
+        columns = data.columns
+
+    _, axes = plt.subplots(len(columns), len(transforms_names) + 1, figsize=figsize)
+
+    for col_index, col_name in enumerate(columns):
+        axes[col_index, 0].set_ylabel(col_name)
+
+        # normal dist
+        g = sns.histplot(data[col_name].to_numpy(), ax=axes[col_index, 0])
+        g.set(xlabel=None)
+
+        # log
+        new_dist = transforms.log[col_name]
+        g = sns.histplot(new_dist.to_numpy(), ax=axes[col_index, 1])
+        g.set(xlabel=None, ylabel=None)
+
+        # cox box 
+        new_dist = transforms.boxcox[0][col_name]
+        g = sns.histplot(new_dist, ax=axes[col_index, 2])
+        g.set(xlabel=None, ylabel=None)
+
+        # cubic root
+        new_dist = transforms.cbrt[col_name]
+        g = sns.histplot(new_dist, ax=axes[col_index, 3])
+        g.set(xlabel=None, ylabel=None)
+
+    axes[0, 0].set_title("Dist. Originale")
+    axes[0, 1].set_title("Log")
+    axes[0, 2].set_title("Boxcox")
+    axes[0, 3].set_title("Cubic Root")
+
+    plt.tight_layout()
+    plt.show()
+
+    return transforms
+
 def show_outliers_iqr(data, eta=1.5, show_outliers_values=False, boxlists=None, figsize=(8, 6.5)):
     """
     threshold ~10-15%
@@ -163,16 +233,21 @@ def show_outliers_iqr(data, eta=1.5, show_outliers_values=False, boxlists=None, 
         
     return outliers_rows.index
 
-def show_correlation(data, figsize=(6, 3), pairplot=False, pairplot_figsize=(8, 6)):
+def show_correlation(data, 
+                     method='pearson', 
+                     corner=True, 
+                     figsize=(6, 3), 
+                     pairplot=False, 
+                     pairplot_figsize=(8, 6)):
     plt.figure(figsize=figsize)
-    sns.heatmap(data.corr().round(2), annot=True, linewidths=0.01, ax=plt.gca())
-    plt.title("Corrélation")
+    sns.heatmap(data.corr(method=method).round(2), annot=True, linewidths=0.01, ax=plt.gca())
+    plt.title(f"Corrélation - {method}")
     plt.show()
     
     # mac a quelques problemes avec le temps d'execution du pairplot
     # mettre cette affichage optionel
     if pairplot:
-        g = sns.pairplot(data, corner=True)
+        g = sns.pairplot(data, corner=corner)
         g.fig.set_size_inches(*pairplot_figsize)
         plt.suptitle("Pair plot")
         plt.show()
