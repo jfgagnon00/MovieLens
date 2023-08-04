@@ -1,7 +1,7 @@
 # Taches
 
 * Pretraitement
-    * Reste qqch?
+    * Diminuer le nombre de genres via regles association/clustering
 
 * Transformations sur data 
     * rendre plus gaussien 
@@ -10,9 +10,9 @@
 
 * Reduction de dimentionalite/visualisation
     * Devrait-on essayer avec [MDS](https://scikit-learn.org/stable/modules/generated/sklearn.manifold.MDS.html))?
-    * Devrait-on essayer avec autoencoder?
+        * faudrait aficher le metrique stress
 
-* Clustering
+* Clustering (A58)
     * AMF
     * AFDM
     * TruncatedSVD ?
