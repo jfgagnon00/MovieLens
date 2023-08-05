@@ -1,22 +1,17 @@
-# Taches
-
-* Pretraitement
-    * Diminuer le nombre de genres via regles association/clustering
+# Taches - A56
 
 * Transformations sur data 
-    * rendre plus gaussien 
-    * categoriser
-    * tf-idf comme valeurs numériques? (c'est un peu ce que AFDM fait non?)
+    * rendre plus gaussien year
+    * categoriser year
+    * reduction modalites genres via tf-idf
+    * reduction modalites genres via regles association
 
-* Reduction de dimentionalite/visualisation
-    * Devrait-on essayer avec [MDS](https://scikit-learn.org/stable/modules/generated/sklearn.manifold.MDS.html))?
-        * faudrait aficher le metrique stress
+# Taches - A58
 
-* Clustering (A58)
-    * AMF
+* Clustering
+    * ACM
     * AFDM
-    * TruncatedSVD ?
-    * MDS
+    * Separee (genres, rating_mode) et annee pour faire cluster
+    * Analyse: chi_square sur table de contingence
 
-* Systeme de suggestion
-    * on fait quoi avec users (ratings.csv)
+* Regles associations
