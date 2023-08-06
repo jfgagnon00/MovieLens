@@ -1,11 +1,3 @@
-# Taches - A56
-
-* Transformations sur data 
-    * rendre plus gaussien year
-    * categoriser year
-    * reduction modalites genres via tf-idf
-    * reduction modalites genres via regles association
-
 # Taches - A58
 
 * Clustering
