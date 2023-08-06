@@ -548,7 +548,7 @@ def show_clusters(coords_, coords_name_, labels, figsize=(5, 4), text_alpha=1, m
     plt.figure(figsize=figsize)
     for k in clusters:
         cluster = labels == k
-        coords = coords_[cluster]
+        coords = coords_[cluster].to_numpy()
         coords_name = coords_name_[cluster]
 
         label = "Outliers" if k == -1 else f"Cluster_{k}"
