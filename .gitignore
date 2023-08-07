@@ -6,3 +6,4 @@ __pycache__/
 # a ignorer dans le repertoire courant
 /dataset
 /models
+/sandbox
