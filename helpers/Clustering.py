@@ -147,7 +147,7 @@ def show_transforms(data, columns=None, figsize=(10, 10)):
     if columns is None:
         columns = data.columns
 
-    _, axes = plt.subplots(len(columns), len(transforms_names) + 1, figsize=figsize)
+    _, axes = plt.subplots(len(columns), len(transforms_names) + 1, figsize=figsize, squeeze=False)
 
     for col_index, col_name in enumerate(columns):
         axes[col_index, 0].set_ylabel(col_name)
