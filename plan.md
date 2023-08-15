@@ -1,6 +1,9 @@
 # Taches - A56
 
 * Revision du draft
+* Présentation du projet (20 minutes)
+    - 1 question par personne
+    - 10 minutes par personnes
 
 # Taches - A58
 
