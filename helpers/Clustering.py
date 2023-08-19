@@ -562,6 +562,12 @@ def clusters_analysis(coords, labels, original_data=None):
     
     return None
     
+def scatter_plot(coords_, figsize=(5, 4), marker_size=None):
+    plt.figure(figsize=figsize)
+    plt.scatter(coords_[:, 0], coords_[:, 1], s=marker_size)
+    plt.grid(True)
+    plt.show()
+
 def show_clusters(coords_, coords_name_, labels, figsize=(5, 4), text_alpha=1, marker_size=None):
     clusters = set(labels)
     n_clusters = len(clusters)
