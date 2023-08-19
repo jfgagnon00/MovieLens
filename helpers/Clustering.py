@@ -16,10 +16,11 @@ from scipy.cluster.hierarchy import dendrogram, linkage
 
 from sklearn.decomposition import PCA as sk_PCA
 from sklearn.preprocessing import StandardScaler, RobustScaler
-from sklearn.cluster import KMeans, AgglomerativeClustering, DBSCAN
+from sklearn.cluster import KMeans, MiniBatchKMeans, AgglomerativeClustering, DBSCAN
 from sklearn.neighbors import NearestNeighbors
 from sklearn.metrics import silhouette_score, \
-                            silhouette_samples
+                            silhouette_samples, \
+                            davies_bouldin_score
 
 #
 # Note au correcteur:
@@ -370,17 +371,25 @@ def acm_analysis(data, figsize=(4, 2.5)):
     plt.ylabel("Valeur propre")
     plt.show()
 
-def kmeans_init(coords, n_clusters, n_init=20, max_iter=300):
-    clstr = KMeans(n_clusters=n_clusters, n_init=n_init, max_iter=max_iter)
+def kmeans_init(coords, n_clusters, n_init=20, max_iter=300, use_mini_batch=False):
+    if use_mini_batch:
+        clstr = MiniBatchKMeans(n_clusters=n_clusters, n_init=n_init, max_iter=max_iter)
+    else:
+        clstr = KMeans(n_clusters=n_clusters, n_init=n_init, max_iter=max_iter)
     clstr.fit(coords)
     return clstr
     
-def kmeans_analysis(coords, clusters_range=range(2, 15), n_init=20, max_iter=300, figsize=(5, 3)):
+def kmeans_analysis(coords, 
+                    clusters_range=range(2, 15), 
+                    n_init=20, 
+                    max_iter=300,
+                    use_mini_batch=False,
+                    figsize=(5, 3)):
     inertias = []
     sil_scores = []
     
     for k in clusters_range:
-        clstr = kmeans_init(coords, k, n_init, max_iter)
+        clstr = kmeans_init(coords, k, n_init, max_iter, use_mini_batch)
         inertias.append(clstr.inertia_)
         sil_scores.append( silhouette_score(coords, clstr.labels_) )
     
@@ -501,10 +510,14 @@ def dbscan_outliers_analysis(coords, eps_range, min_samples, figsize=(5, 3)):
     plt.show()
 
 def clusters_analysis(coords, labels, original_data=None):
+    score = davies_bouldin_score(coords, labels)
+    print("Davies Bouldin score:", round(score, 4))
+
+    print()
+
     score = silhouette_score(coords, labels)
     print("Silhouette score:", round(score, 4))
-    print()
-    
+
     samples = silhouette_samples(coords, labels)
     samples_means = []
     clusters = set(labels)
@@ -535,8 +548,19 @@ def clusters_analysis(coords, labels, original_data=None):
         r2 = bss / tss
         r2.name = "$R^2$"
 
-        print("Variance expliquée par les clusters")
-        display(r2.round(2).to_frame().T)
+        r2.sort_values(ascending=False, inplace=True)
+
+        print("Clusters means")
+        display(groups.mean())
+
+        print()
+
+        print("Variance expliquée par les clusters (triée par R2)")
+        display(r2.round(3).to_frame().T)
+
+        return r2
+    
+    return None
     
 def show_clusters(coords_, coords_name_, labels, figsize=(5, 4), text_alpha=1, marker_size=None):
     clusters = set(labels)
