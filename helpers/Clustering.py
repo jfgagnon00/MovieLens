@@ -399,7 +399,8 @@ def kmeans_analysis(coords,
     ax1.set_xlabel("# clusters")
     ax1.set_ylabel("wss")
     ax1.grid(True)
-    
+    ax1.xaxis.set_major_locator(MaxNLocator(integer=True))
+
     ax2 = plt.gca().twinx()
     ax2.plot(clusters_range, sil_scores, label="silhouette score", color="blue", marker=".")
     ax2.set_ylabel("silhouette score")
@@ -568,6 +569,41 @@ def scatter_plot(coords_, figsize=(5, 4), marker_size=None):
     plt.grid(True)
     plt.show()
 
+def scatter_multiplot(coords_, num_cols=5, figsize=(10, 6), marker_size=None, labels=None):
+    num_dimensions = coords_.shape[1]
+    num_graphs = num_dimensions - 1
+    num_rows = math.ceil(num_graphs / num_cols)
+    _, axes = plt.subplots(num_rows, num_cols, figsize=(12, 9), squeeze=False)
+
+    if labels is None:
+        for coord, ax in zip(range(num_graphs), axes.flatten()):
+            x = coords_[:, coord]
+            y = coords_[:, coord + 1]
+            ax.scatter(x, y, s=marker_size)
+            ax.set_title(f"Coords: {coord}, {coord + 1}")
+            ax.grid(True)
+    else:
+        clusters = set(labels)
+        n_clusters = len(clusters)
+        
+        colors_steps = np.arange(0, 1, 1 / n_clusters)
+        colors = plt.cm.nipy_spectral(colors_steps)
+
+        for coord, ax in zip(range(num_graphs), axes.flatten()):
+            for k in clusters:
+                rows = labels == k
+                label = "Outliers" if k == -1 else f"Cluster_{k}"
+
+                x = coords_[rows, coord]
+                y = coords_[rows, coord + 1]
+                ax.scatter(x, y, label=label, color=colors[k], s=marker_size)
+                ax.set_title(f"Coords: {coord}, {coord + 1}")
+                ax.grid(True)
+
+        axes[0, 0].legend()
+
+    plt.show()
+
 def show_clusters(coords_, coords_name_, labels, figsize=(5, 4), text_alpha=1, marker_size=None):
     clusters = set(labels)
     n_clusters = len(clusters)
@@ -582,14 +618,14 @@ def show_clusters(coords_, coords_name_, labels, figsize=(5, 4), text_alpha=1, m
             coords = coords_[cluster].to_numpy()
         else:
             coords = coords_[cluster]
-        coords_name = coords_name_[cluster]
 
         label = "Outliers" if k == -1 else f"Cluster_{k}"
         plt.scatter(coords[:, 0], coords[:, 1], label=label, color=colors[k], s=marker_size)
         
-        for xy, text in zip(coords, coords_name_):
-            text_ = plt.text(xy[0], xy[1], text)
-            text_.set_alpha(text_alpha)
+        if not coords_name_ is None and text_alpha > 0:
+            for xy, text in zip(coords, coords_name_):
+                text_ = plt.text(xy[0], xy[1], text)
+                text_.set_alpha(text_alpha)
 
     plt.grid(True)
     plt.legend(bbox_to_anchor=(1.05, 1.0))
