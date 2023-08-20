@@ -445,8 +445,8 @@ def dbscan_init(coords, eps, min_samples):
     dbs.fit(coords)
     return dbs
 
-def dbscan_eps_analysis(coords, figsize=(5, 3), ylim=None):
-    nn = NearestNeighbors(n_neighbors=2)
+def dbscan_eps_analysis(coords, figsize=(5, 3), ylim=None, n_neighbors=2):
+    nn = NearestNeighbors(n_neighbors=n_neighbors)
     distances, _ = nn.fit(coords).kneighbors(coords)
     distances = np.sort(distances, axis=0)
 
@@ -573,7 +573,7 @@ def scatter_multiplot(coords_, num_cols=5, figsize=(10, 6), marker_size=None, la
     num_dimensions = coords_.shape[1]
     num_graphs = num_dimensions - 1
     num_rows = math.ceil(num_graphs / num_cols)
-    _, axes = plt.subplots(num_rows, num_cols, figsize=(12, 9), squeeze=False)
+    _, axes = plt.subplots(num_rows, num_cols, figsize=figsize, squeeze=False)
 
     if labels is None:
         for coord, ax in zip(range(num_graphs), axes.flatten()):
@@ -602,6 +602,7 @@ def scatter_multiplot(coords_, num_cols=5, figsize=(10, 6), marker_size=None, la
 
         axes[0, 0].legend()
 
+    plt.tight_layout()
     plt.show()
 
 def show_clusters(coords_, coords_name_, labels, figsize=(5, 4), text_alpha=1, marker_size=None):
