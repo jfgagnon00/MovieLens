@@ -429,6 +429,7 @@ def cah_analysis(coords, method="ward", metric="euclidean", figsize=(12, 3.5)):
     plt.xlabel("# clusters")
     plt.ylabel("Inertie")
     plt.grid()
+    plt.gca().xaxis.set_major_locator(MaxNLocator(integer=True))
     
     plt.show()
     
