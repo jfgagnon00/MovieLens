@@ -22,14 +22,6 @@ from sklearn.metrics import silhouette_score, \
                             silhouette_samples, \
                             davies_bouldin_score
 
-#
-# Note au correcteur:
-# Ceci est le code que j'utilise pour faire les exercices donnés en classes. Je me suis permis de 
-# l'utiliser car je pense qu'il aide la correction (quelques points à valider pour trouver erreurs
-# d'implémentation) et focus mon raisonement sur l'objectifs à atteindre et non comment l'atteindre.
-# Si jamais, il y avait problème, je peux fournir un historique github montrant que j'ai dévelopé
-# par moi-même et non copier.
-#
 
 def show_na(data):
     na_rows = data.isna().any(axis=1)
@@ -411,28 +403,28 @@ def kmeans_analysis(coords,
 
     plt.show()
     
-def cah_init(coords, n_clusters):
+def cah_init(coords, n_clusters, metric="euclidean", linkage="ward"):
     cah = AgglomerativeClustering(n_clusters=n_clusters, 
-                                  metric="euclidean", 
-                                  linkage='ward')
+                                  metric=metric, 
+                                  linkage=linkage)
     cah.fit(coords)
     return cah
 
-def cah_analysis(coords, figsize=(7, 7)):
+def cah_analysis(coords, method="ward", metric="euclidean", figsize=(12, 3.5)):
     """
     Le threshold est a peu pres a la moitie de la hauteur
     """
-    linkage_ = linkage(coords, method="ward", metric="euclidean")
+    linkage_ = linkage(coords, method=method, metric=metric)
 
     plt.figure(figsize=figsize)
-    plt.subplot(211)
+    plt.subplot(121)
     dendrogram(linkage_)
     plt.title("Dendogramme")
         
-    cluster_inertias = linkage_[-15:, 2]
+    cluster_inertias = linkage_[-20:, 2]
     cluster_inertias = cluster_inertias[::-1]
     
-    plt.subplot(212)
+    plt.subplot(122)
     plt.step(range(2, len(cluster_inertias) + 2), cluster_inertias)
     plt.xlabel("# clusters")
     plt.ylabel("Inertie")
