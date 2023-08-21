@@ -410,7 +410,7 @@ def cah_init(coords, n_clusters, metric="euclidean", linkage="ward"):
     cah.fit(coords)
     return cah
 
-def cah_analysis(coords, method="ward", metric="euclidean", figsize=(12, 3.5)):
+def cah_analysis(coords, method="ward", metric="euclidean", figsize=(12, 3.5), num_clusters=20):
     """
     Le threshold est a peu pres a la moitie de la hauteur
     """
@@ -421,7 +421,7 @@ def cah_analysis(coords, method="ward", metric="euclidean", figsize=(12, 3.5)):
     dendrogram(linkage_)
     plt.title("Dendogramme")
         
-    cluster_inertias = linkage_[-20:, 2]
+    cluster_inertias = linkage_[-num_clusters:, 2]
     cluster_inertias = cluster_inertias[::-1]
     
     plt.subplot(122)
@@ -562,7 +562,12 @@ def scatter_plot(coords_, figsize=(5, 4), marker_size=None):
     plt.grid(True)
     plt.show()
 
-def scatter_multiplot(coords_, num_cols=5, figsize=(10, 6), marker_size=None, labels=None):
+def scatter_multiplot(coords_, 
+                      num_cols=5, 
+                      figsize=(10, 6), 
+                      marker_size=None, 
+                      labels=None,
+                      show_legend=False):
     num_dimensions = coords_.shape[1]
     num_graphs = num_dimensions - 1
     num_rows = math.ceil(num_graphs / num_cols)
@@ -593,7 +598,8 @@ def scatter_multiplot(coords_, num_cols=5, figsize=(10, 6), marker_size=None, la
                 ax.set_title(f"Coords: {coord}, {coord + 1}")
                 ax.grid(True)
 
-        axes[0, 0].legend()
+        if show_legend:
+            axes[0, 0].legend()
 
     plt.tight_layout()
     plt.show()
