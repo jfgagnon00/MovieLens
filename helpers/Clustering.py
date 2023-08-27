@@ -247,7 +247,7 @@ def show_correlation(data,
 
 def pca_init(std_data, n_components):
     # pour fin de comparaison, choisir au runtime entre fanalysis et scklearn
-    if True:
+    if False:
         acp = fa_PCA(std_unit=False, 
                   n_components=n_components,
                   row_labels=std_data.index,
